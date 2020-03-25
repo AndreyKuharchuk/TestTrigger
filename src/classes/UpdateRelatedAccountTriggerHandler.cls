@@ -6,16 +6,14 @@ public class UpdateRelatedAccountTriggerHandler {
 
     public static void handleInsert(List <Opportunity> newOpportunities) {
         for (Opportunity opp : newOpportunities)
-            if (opp.StageName == 'Closed Won') {
-                if (opp.AccountId != NULL) {
+            if (opp.AccountId != NULL && opp.StageName == 'Closed Won') {
                     addOpportunityToPlus(opp);
-                }
             }
     }
 
     public static void handleUpdate(List <Opportunity> newOpportunities, Map<Id, Opportunity> oldOpportunities) {
         for (Opportunity opp : newOpportunities) {
-            if (oldOpportunities.get(opp.Id).AccountId == opp.AccountId) {
+            if (opp.AccountId != NULL && oldOpportunities.get(opp.Id).AccountId == opp.AccountId) {
                 if (oldOpportunities.get(opp.Id).StageName == 'Closed Won' && opp.StageName == 'Closed Won') {
                     if (oldOpportunities.get(opp.Id).Amount != opp.Amount) {
                         addOpportunityToPlus(opp);
@@ -26,33 +24,31 @@ public class UpdateRelatedAccountTriggerHandler {
                 }else if (oldOpportunities.get(opp.Id).StageName != 'Closed Won' && opp.StageName == 'Closed Won') {
                     addOpportunityToPlus(opp);
                 }
-            } else if (oldOpportunities.get(opp.Id).AccountId != opp.AccountId) {
+            } else if (opp.AccountId != NULL && oldOpportunities.get(opp.Id).AccountId != opp.AccountId) {
                 if (opp.StageName == 'Closed Won') {
                     addOpportunityToPlus(opp);
 
                 } else if (oldOpportunities.get(opp.Id).StageName == 'Closed Won') {
                     addOpportunityToMinus(oldOpportunities.get(opp.Id));
                 }
+            }else if (opp.AccountId == NULL && oldOpportunities.get(opp.Id).AccountId != NULL) {
+                addOpportunityToMinus(oldOpportunities.get(opp.Id));
             }
         }
     }
 
     public static void handleUnDelete(List <Opportunity> newOpportunities) {
         for (Opportunity opp : newOpportunities) {
-            if (opp.StageName == 'Closed Won') {
-                if (opp.AccountId != NULL) {
+            if (opp.AccountId != NULL && opp.StageName == 'Closed Won') {
                     addOpportunityToPlus(opp);
-                }
             }
         }
     }
 
     public static void handleDelete(List <Opportunity> deletedOpportunities) {
         for (Opportunity opp : deletedOpportunities) {
-            if (opp.StageName == 'Closed Won') {
-                if (opp.AccountId != NULL) {
+            if (opp.AccountId != NULL && opp.StageName == 'Closed Won') {
                     addOpportunityToMinus(opp);
-                }
             }
         }
     }
